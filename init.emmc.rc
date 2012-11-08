@@ -1,14 +1,18 @@
 on early-init
-    mkdir /mnt/sdcard 0000 system system
-    # for backwards compatibility
-    symlink /mnt/sdcard /sdcard
+    mkdir /storage 0050 system sdcard_r
+    mkdir /storage/sdcard0 0000 system system
+    mkdir /storage/sdcard1 0000 system system
 
-    mkdir /mnt/emmc 0000 system system
-    symlink /mnt/emmc /emmc
+# for backwards compatibility
+    symlink /storage/sdcard0 /mnt/sdcard
+    symlink /storage/sdcard0 /sdcard
+    symlink  /storage/sdcard1 /external_sd
+    symlink  /storage/sdcard1 /mnt/external_sd
 
     mkdir /mnt/usbdisk 0755 system system
 
-    export EXTERNAL_STORAGE /mnt/emmc
+    export EXTERNAL_STORAGE /storage/sdcard0
+    export SECONDARY_STORAGE /storage/sdcard1
 
 # Vibetonz
     export VIBE_PIPE_PATH /dev/pipes
@@ -28,14 +32,30 @@ on early-fs
 
 on emmc-fs
 # mount mmc partitions
-    wait /dev/block/mmcblk0p24
-    mount ext4 /dev/block/mmcblk0p24 /system ro barrier=1
-    mount ext4 /dev/block/mmcblk0p26 /cache nosuid nodev barrier=1
-    exec /system/bin/e2fsck -p /dev/block/mmcblk0p21
-    mount ext4 /dev/block/mmcblk0p21 /efs nosuid nodev barrier=1
-    wait /dev/block/mmcblk0p25
-    exec /system/bin/e2fsck -p /dev/block/mmcblk0p25
-    mount ext4 /dev/block/mmcblk0p25 /data nosuid nodev barrier=1 noauto_da_alloc
+    mount_all /fstab.qcom
+
+    mount tmpfs tmpfs /system/lib/modules
+    symlink /lib/modules/dal_remotetest.ko /system/lib/modules/dal_remotetest.ko
+    symlink /lib/modules/dma_test.ko /system/lib/modules/dma_test.ko
+    symlink /lib/modules/msm-buspm-dev.ko /system/lib/modules/msm-buspm-dev.ko
+    symlink /lib/modules/ksapi.ko /system/lib/modules/ksapi.ko
+    symlink /lib/modules/ansi_cprng.ko /system/lib/modules/ansi_cprng.ko
+    symlink /lib/modules/qce.ko /system/lib/modules/qce.ko
+    symlink /lib/modules/qcedev.ko /system/lib/modules/qcedev.ko
+    symlink /lib/modules/qcrypto.ko /system/lib/modules/qcrypto.ko
+    symlink /lib/modules/evbug.ko /system/lib/modules/evbug.ko
+    symlink /lib/modules/gspca_main.ko /system/lib/modules/gspca_main.ko
+    symlink /lib/modules/msm_tsif.ko /system/lib/modules/msm_tsif.ko
+    symlink /lib/modules/tsif_chrdev.ko /system/lib/modules/tsif_chrdev.ko
+    symlink /lib/modules/vibrator.ko /system/lib/modules/vibrator.ko
+    symlink /lib/modules/dhd.ko /system/lib/modules/dhd.ko
+    symlink /lib/modules/scsi_wait_scan.ko /system/lib/modules/scsi_wait_scan.ko
+    symlink /lib/modules/spidev.ko /system/lib/modules/spidev.ko
+    symlink /lib/modules/lcd.ko /system/lib/modules/lcd.ko
+    symlink /lib/modules/tcp_htcp.ko /system/lib/modules/tcp_htcp.ko
+    symlink /lib/modules/tcp_westwood.ko /system/lib/modules/tcp_westwood.ko
+    symlink /lib/modules/cls_flow.ko /system/lib/modules/cls_flow.ko
+    symlink /lib/modules/sch_dsmark.ko /system/lib/modules/sch_dsmark.ko
 
     chown radio system /efs
     chmod 0771 /efs
@@ -287,12 +307,12 @@ service ril-daemon /system/bin/rild
     socket rild stream 660 root radio
     socket rild-debug stream 660 radio system
     user root
-    group radio cache inet misc audio sdcard_rw qcom_oncrpc diag log
+    group radio cache inet misc audio sdcard_rw qcom_oncrpc qcom_diag log
 
 service secril-daemon /system/bin/sec-ril
     class main
     user root
-    group radio cache inet misc audio sdcard_rw diag log
+    group radio cache inet misc audio sdcard_rw qcom_diag log
 
 # for datarouter
 #service DR-daemon /system/bin/drexe
