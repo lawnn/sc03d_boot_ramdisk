@@ -57,6 +57,7 @@ on emmc-fs
     symlink /lib/modules/cls_flow.ko /system/lib/modules/cls_flow.ko
     symlink /lib/modules/sch_dsmark.ko /system/lib/modules/sch_dsmark.ko
     symlink /lib/modules/mmc_test.ko /system/lib/modules/mmc_test.ko
+    symlink /lib/modules/cifs.ko /system/lib/modules/cifs.ko
 
     chown radio system /efs
     chmod 0771 /efs
