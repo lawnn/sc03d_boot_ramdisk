@@ -55,8 +55,6 @@ mount tmpfs tmpfs /system/lib/modules
     symlink /lib/modules/msm-buspm-dev.ko /system/lib/modules/msm-buspm-dev.ko
     symlink /lib/modules/cls_flow.ko /system/lib/modules/cls_flow.ko
     symlink /lib/modules/sch_dsmark.ko /system/lib/modules/sch_dsmark.ko
-    symlink /lib/modules/tcp_westwood.ko /system/lib/modules/tcp_westwood.ko
-    symlink /lib/modules/tcp_htcp.ko /system/lib/modules/tcp_htcp.ko
 
     # Keeping following partitions outside fstab file. As user may not have
     # these partition flashed on the device. Failure to mount any partition in fstab file
@@ -405,10 +403,14 @@ service mpdecision /system/bin/mpdecision --no_sleep --avg_comp
     user root
     disabled
 
-#service thermald /system/bin/thermald
-#    class main
-#    user root
-#    group root
+service thermald /system/bin/thermald
+    class main
+    user root
+    group root
+    disabled
+
+on property.ro.modem.links.done=1
+    start thermald
 
 # qrngd will drop permissions after startup
 service qrngd /system/bin/qrngd -f
